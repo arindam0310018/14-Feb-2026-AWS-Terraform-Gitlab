@@ -1,0 +1,118 @@
+###############################################################################
+## Docker image used by the pipeline.
+## Tells GitLab which Docker image to use for every job.
+## This image already has Terraform installed, so we don’t need to install.
+###############################################################################
+image:
+#  name: registry.gitlab.com/gitlab-org/gitlab-build-images:terraform
+  name: hashicorp/terraform:1.6.6
+
+####################################################################
+## Custom entrypoint.
+## Overrides the default Docker entrypoint.
+## Ensures a clean shell environment with a properly set PATH.
+## Prevents issues where Terraform or binaries are not found.
+####################################################################
+  entrypoint:
+    - '/usr/bin/env'
+    - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+
+##################################
+## Environmental Variables.
+##################################
+variables:
+  TF_VAR_gitlab_token: ${GITLAB_ACCESS_TOKEN}
+  AWS_ACCESS_KEY_ID: ${MY_AWS_KEY}
+  AWS_SECRET_ACCESS_KEY : ${MY_AWS_ACCESS_KEY}
+  AWS_DEFAULT_REGION: "europe-central-1"
+
+##################################
+## Terraform plugin cache.
+## Use Cache downloaded Terraform providers and modules.
+## Avoids re-downloading providers every time.
+## This Speeds up pipeline runs.
+## This cache is shared between jobs in the pipeline.
+##################################
+cache:
+  paths:
+    - .terraform
+
+########################################################
+## Runs before every stage.
+## Version of Terraform.
+## Initialise backend, providers and modules.
+## This ensures every job uses the same remote state.
+########################################################
+before_script:
+  - terraform --version
+  - terraform init -reconfigure -backend-config="backend.hcl"
+
+##################################################
+## Below follows the order.
+## Each stage must succeed before the next runs.
+##################################################
+stages:
+  - validate
+  - plan
+  - apply
+  - destroy
+
+###################
+## Validate Stage.
+###################
+validate:
+  stage: validate
+  script:
+    - terraform validate
+
+################################################################################################################
+## Plan Stage.
+## Split variables Per Environment, Generate and Save the Terraform Plan.
+## Depends upon validate stage.
+## Published Terraform plan file saved as artifacts to ensure that it can be made available for later stages. 
+################################################################################################################
+plan:
+  stage: plan
+  script:
+    - terraform plan -var-file="prod.tfvars" -out="tfplan"
+  dependencies:
+    - validate
+  artifacts:
+    paths:
+      - tfplan
+
+#################################################
+## Apply Stage.
+## Applies only to the saved plan.
+## Depends upon plan stage.
+## Requires Manual Approval.
+## Provide Gitlab Environment.
+## Conditions applied - Branch has to "main"
+#################################################
+apply:
+  stage: apply
+  script:
+    - terraform apply tfplan
+  dependencies:
+    - plan
+  when: manual
+  environment:
+    name: PROD
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+###############################################
+## Destroy Stage.
+## Requires Manual Approval.
+## Provide Gitlab Environment.
+## Conditions applied - Branch has to "main"
+###############################################
+destroy: 
+  stage: destroy
+  script:
+    - terraform destroy -var-file="prod.tfvars" --auto-approve
+  when: manual
+  environment:
+    name: PROD
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" 
