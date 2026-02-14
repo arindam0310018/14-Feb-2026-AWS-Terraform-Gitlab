@@ -1,2 +1,2 @@
-# 14-Feb-2026-AWS
-Terraform, Gitlab, and AWS
+# AWS | Terraform | Gitlab:-
+This Repository contains everything related to AWS, Terraform and Gitlab.
