@@ -34,6 +34,7 @@ variable "ec2" {
   description = "EC2 configuration"
   type = object({
     instance_count                = number
+    ami_id                        = string
     instance_type                 = string
     key_name                      = string
     root_volume_size_gb           = number

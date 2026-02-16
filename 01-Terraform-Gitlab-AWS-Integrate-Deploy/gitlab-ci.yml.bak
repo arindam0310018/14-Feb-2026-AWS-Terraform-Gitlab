@@ -1,14 +1,4 @@
 ###############################################################################
-# Manual-only pipelines (stop triggering on every commit/push)
-# Runs ONLY when started from UI: CI/CD -> Pipelines -> New pipeline
-###############################################################################
-workflow:
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "web"'
-      when: always
-    - when: never
-
-###############################################################################
 ## Docker image used by the pipeline.
 ## Tells GitLab which Docker image to use for every job.
 ## This image already has Terraform installed, so we don’t need to install.
@@ -35,13 +25,6 @@ variables:
   AWS_ACCESS_KEY_ID: ${MY_AWS_KEY}
   AWS_SECRET_ACCESS_KEY : ${MY_AWS_ACCESS_KEY}
   AWS_DEFAULT_REGION: "europe-central-1"
-  TF_ENV:
-    value: "prod"
-    options:
-      - "dev"
-      - "uat"
-      - "prod"
-    description: "select the environment to be deployed."
 
 ##################################
 ## Terraform plugin cache.
@@ -62,7 +45,7 @@ cache:
 ########################################################
 before_script:
   - terraform --version
-  - terraform init -reconfigure -backend-config="backend-${TF_ENV}.hcl"
+  - terraform init -reconfigure -backend-config="backend.hcl"
 
 ##################################################
 ## Below follows the order.
@@ -91,7 +74,7 @@ validate:
 plan:
   stage: plan
   script:
-    - terraform plan -var-file="${TF_ENV}.tfvars" -out="tfplan"
+    - terraform plan -var-file="prod.tfvars" -out="tfplan"
   dependencies:
     - validate
   artifacts:
@@ -114,7 +97,7 @@ apply:
     - plan
   when: manual
   environment:
-    name: ${TF_ENV}
+    name: PROD
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
 
@@ -127,9 +110,9 @@ apply:
 destroy: 
   stage: destroy
   script:
-    - terraform destroy -var-file="${TF_ENV}.tfvars" --auto-approve
+    - terraform destroy -var-file="prod.tfvars" --auto-approve
   when: manual
   environment:
-    name: ${TF_ENV}
+    name: PROD
   rules:
     - if: $CI_COMMIT_BRANCH == "main" 

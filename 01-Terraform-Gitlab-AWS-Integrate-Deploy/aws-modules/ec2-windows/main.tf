@@ -1,22 +1,23 @@
-data "aws_ami" "aws-windows2022" {
-  most_recent               = true
-  owners                    = ["amazon"]
+# data "aws_ami" "aws-windows2022" {
+#   most_recent               = true
+#   owners                    = ["amazon"]
 
-# Windows Server 2022 Base AMI published by Amazon
-  filter {
-    name                    = "name"
-    values                  = ["Windows_Server-2022-English-Full-Base-*"]
-  }
+# # Windows Server 2022 Base AMI published by Amazon
+#   filter {
+#     name                    = "name"
+#     values                  = ["Windows_Server-2022-English-Full-Base-*"]
+#   }
 
-  filter {
-    name                    = "virtualization-type"
-    values                  = ["hvm"]
-  }
-}
+#   filter {
+#     name                    = "virtualization-type"
+#     values                  = ["hvm"]
+#   }
+# }
 
 resource "aws_instance" "am-win-ec2instance" {
   count                     = var.instance_count
-  ami                       = data.aws_ami.aws-windows2022.id
+  #ami                       = data.aws_ami.aws-windows2022.id
+  ami                       = var.ami_id
   instance_type             = var.instance_type
 
   subnet_id                 = var.subnet_id

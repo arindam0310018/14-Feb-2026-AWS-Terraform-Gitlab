@@ -1,6 +1,11 @@
 variable "instance_count" {
   type              = number
-  description       = "Number of EC2 instances to create"
+  description       = "Number of EC2 instances to create."
+}
+
+variable "ami_id" {
+  type              = string
+  description       = "Windows AMI ID."
 }
 
 variable "instance_type" {

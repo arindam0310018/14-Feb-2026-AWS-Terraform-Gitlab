@@ -69,6 +69,7 @@ network = {
 
 ec2 = {
   instance_count                = 2
+  ami_id                        = "ami-08f7638d7dc2a351c"
   instance_type                 = "t3.micro"   # Free-tier - t2.micro or t3.micro depending on account/region.
   key_name                      = ""  # recommended for Windows admin password retrieval.
 

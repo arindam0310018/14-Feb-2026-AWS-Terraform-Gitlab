@@ -17,6 +17,7 @@ module "ec2-windows" {
   source = "./aws-modules/ec2-windows"
 
   instance_count                  = var.ec2.instance_count
+  ami_id                          = var.ec2.ami_id
   instance_type                   = var.ec2.instance_type
   key_name                        = var.ec2.key_name
   subnet_id                       = module.network.subnet_id
