@@ -1,0 +1,70 @@
+************************************
+Validate if AWS MGN is Initialized:-
+************************************
+
+aws mgn describe-source-servers
+
+----------------------------------------------------
+
+C:\Users\AM>aws mgn describe-source-servers
+
+An error occurred (AccessDeniedException) when calling the DescribeSourceServers operation: User: arn:aws:iam::016299216080:user/gitlab-tf-user is not authorized to perform: mgn:DescribeSourceServers on resource: arn:aws:mgn:eu-central-1:016299216080:source-server/* because no identity-based policy allows the mgn:DescribeSourceServers action
+
+C:\Users\AM>
+
+----------------------------------------------------
+
+Above Error indicates, IAM user (gitlab-tf-user) don’t have permission to query AWS MGN. 
+We need to add an identity-based policy that allows the MGN read actions (or broader, if you’re also managing MGN via Terraform/pipelines).
+
+FIX:-
+********
+
+Added below minimal read-only MGN policy:-
+**********************************************
+
+Name of the In-line Policy Created: "Read-Only-MGN-Policy".
+Type: Customer In-line
+Attached via: Inline
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "MGNReadOnlyEssentials",
+      "Effect": "Allow",
+      "Action": [
+        "mgn:GetAccountSettings",
+        "mgn:DescribeSourceServers",
+        "mgn:DescribeReplicationConfigurationTemplates",
+        "mgn:DescribeLaunchConfigurationTemplates",
+        "mgn:DescribeJobs",
+        "mgn:ListTagsForResource",
+        "mgn:DescribeReplicationServerAssociationsForMgn"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+
+---------------------------------------------------------
+
+**********************************************
+Again, Validate if AWS MGN is initilaized:-
+**********************************************
+
+aws mgn describe-source-servers --region eu-central-1
+
+-------------------------------------------------------------------------
+C:\Users\AM>aws mgn describe-source-servers --region eu-central-1
+
+An error occurred (UninitializedAccountException) when calling the DescribeSourceServers operation: Account not initialized
+
+C:\Users\AM>
+
+
+Note:-
+------
+The Error Indicates that AWS MGN is not Initialised.
+
+---------------------------------------------------------
