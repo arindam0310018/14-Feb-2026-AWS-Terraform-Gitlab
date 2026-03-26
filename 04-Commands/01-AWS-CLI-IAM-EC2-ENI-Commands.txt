@@ -1,0 +1,361 @@
+*************************************
+Validate if AWS CLI is installed:-
+*************************************
+
+aws --version
+
+-----------------------------------------------------------
+
+C:\Users\AM>aws --version
+
+aws-cli/2.33.19 Python/3.13.11 Windows/11 exe/AMD64
+
+C:\Users\AM>
+
+-----------------------------------------------------------
+
+*******************************
+Location:-
+*******************************
+
+where aws
+
+---------------------------------
+
+C:\Users\AM>where aws
+
+C:\Program Files\Amazon\AWSCLIV2\aws.exe
+
+C:\Users\AM>
+
+---------------------------------
+
+*******************************
+Verify Credentials:-
+*******************************
+
+aws sts get-caller-identity
+
+---------------------------------
+
+C:\Users\AM>aws sts get-caller-identity
+{
+    "UserId": "AIDAQHS4CJTIJZD4KILHN",
+    "Account": "016299216080",
+    "Arn": "arn:aws:iam::016299216080:user/gitlab-tf-user"
+}
+C:\Users\AM>
+
+
+NOTE:-
+--------
+If above is the output, this means AWS CLI is connected to your AWS account.
+
+---------------------------------
+
+*******************************
+See all configured Profiles:-
+*******************************
+
+aws configure list-profiles
+------------------------------------------
+
+C:\Users\AM>aws configure list-profiles
+
+default
+
+C:\Users\AM>
+
+------------------------------------------
+
+*********************************************
+Check which credentials profile is used:-
+*********************************************
+
+aws configure list
+------------------------------------------------------------------------------------
+
+C:\Users\AM>aws configure list
+
+NAME       : VALUE                    : TYPE             : LOCATION
+profile    : <not set>                : None             : None
+access_key : ****************O4U7     : shared-credentials-file :
+secret_key : ****************xG/o     : shared-credentials-file :
+region     : eu-central-1             : config-file      : ~/.aws/config
+
+C:\Users\AM>
+
+------------------------------------------------------------------------------------
+
+**********************
+Important to Note:-
+**********************
+
+You cannot log in to the AWS Console as the root user using AWS CLI. AWS does not allow CLI authentication for the root user for security reasons.
+The root user only supports interactive login via the browser, using:
+	- Root email
+	- Root password
+	- MFA (if enabled)
+
+------------------------------------------------------------------------------------
+
+***************************
+Describe EC2 Instances:-
+***************************
+aws ec2 describe-instances --query "Reservations[].Instances[].InstanceId" --output table --region eu-central-1
+
+-------------------------------------------------------------------------------------
+
+C:\Users\AM>aws ec2 describe-instances --query "Reservations[].Instances[].InstanceId" --output table --region eu-central-1
+
+-------------------------
+|   DescribeInstances   |
++-----------------------+
+|  i-0e5fbfdbde368de1d  |
+|  i-01518dc8f64d6715c  |
++-----------------------+
+
+C:\Users\AM>
+
+-------------------------------------------------------------------------------------
+
+
+********************************************
+Describe EC2 Instances and its State:-
+********************************************
+
+aws ec2 describe-instances --query "Reservations[].Instances[].[InstanceId,State.Name]" --output table --region eu-central-1
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+C:\Users\AM>aws ec2 describe-instances --query "Reservations[].Instances[].[InstanceId,State.Name]" --output table --region eu-central-1
+------------------------------------
+|         DescribeInstances        |
++----------------------+-----------+
+|  i-0e5fbfdbde368de1d |  running  |
+|  i-01518dc8f64d6715c |  running  |
++----------------------+-----------+
+
+C:\Users\AM>
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+************************************************************************************************
+Describe EC2 Instances and its State, Instance Type, IP Address, AvailabilityZone, Platform:-
+************************************************************************************************
+
+aws ec2 describe-instances --query "Reservations[].Instances[].[InstanceId,State.Name,InstanceType,PrivateIpAddress,Placement.AvailabilityZone,Platform]" --output table --region eu-central-1
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+C:\Users\AM>aws ec2 describe-instances --query "Reservations[].Instances[].[InstanceId,State.Name,InstanceType,PrivateIpAddress,Placement.AvailabilityZone,Platform]" --output table --region eu-central-1
+---------------------------------------------------------------------------------------------
+|                                     DescribeInstances                                     |
++----------------------+----------+-----------+----------------+----------------+-----------+
+|  i-0e5fbfdbde368de1d |  running |  t3.micro |  192.168.10.29 |  eu-central-1a |  windows  |
+|  i-01518dc8f64d6715c |  running |  t3.micro |  192.168.10.21 |  eu-central-1a |  windows  |
++----------------------+----------+-----------+----------------+----------------+-----------+
+
+C:\Users\AM>
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+**********************************************************
+Created Elastic Network Interface (ENI) WITHOUT Name:-
+**********************************************************
+
+aws ec2 create-network-interface --subnet-id subnet-07aeeb5d0be46e10a --private-ip-address 192.168.10.15 --groups sg-0d096b2b1ba49eaae --description "ENI-for-App01" --region eu-central-1
+
+---------------------------
+
+C:\Users\AM>aws ec2 create-network-interface --subnet-id subnet-07aeeb5d0be46e10a --private-ip-address 192.168.10.15 --groups sg-0d096b2b1ba49eaae --description "ENI-for-App01" --region eu-central-1
+{
+    "NetworkInterface": {
+        "AvailabilityZone": "eu-central-1a",
+        "Description": "ENI-for-App01",
+        "Groups": [
+            {
+                "GroupId": "sg-0d096b2b1ba49eaae",
+                "GroupName": "prod-sg"
+            }
+        ],
+        "InterfaceType": "interface",
+        "Ipv6Addresses": [],
+        "MacAddress": "02:60:fd:03:d3:e5",
+        "NetworkInterfaceId": "eni-0c1ca7dee946c9b01",
+        "OwnerId": "016299216080",
+        "PrivateDnsName": "ip-192-168-10-15.eu-central-1.compute.internal",
+        "PrivateIpAddress": "192.168.10.15",
+        "PrivateIpAddresses": [
+            {
+                "Primary": true,
+                "PrivateDnsName": "ip-192-168-10-15.eu-central-1.compute.internal",
+                "PrivateIpAddress": "192.168.10.15"
+            }
+        ],
+        "RequesterId": "AIDAQHS4CJTIJZD4KILHN",
+        "RequesterManaged": false,
+        "SourceDestCheck": true,
+        "Status": "pending",
+        "SubnetId": "subnet-07aeeb5d0be46e10a",
+        "TagSet": [],
+        "VpcId": "vpc-0a7dc8eb09f52cc13",
+        "Operator": {
+            "Managed": false
+        },
+        "AvailabilityZoneId": "euc1-az2"
+    }
+}
+
+
+C:\Users\AM>
+
+---------------------------
+
+****************************************************************************************************
+Describe ENI - Description, Subnet ID, Security Group Name, Security Group ID, IP Address, State:-
+****************************************************************************************************
+
+aws ec2 describe-network-interfaces --query "NetworkInterfaces[*].[Description,SubnetId,Groups[*].GroupName,Groups[*].GroupId,PrivateIpAddress,Status]" --output table --region eu-central-1
+
+-------------------------------------------------------------------------------
+
+C:\Users\AM>aws ec2 describe-network-interfaces --query "NetworkInterfaces[*].[Description,SubnetId,Groups[*].GroupName,Groups[*].GroupId,PrivateIpAddress,Status]" --output table --region eu-central-1
+------------------------------
+|  DescribeNetworkInterfaces |
++----------------------------+
+|  ENI-for-App01             |
+|  subnet-07aeeb5d0be46e10a  |
+|  prod-sg                   |
+|  sg-0d096b2b1ba49eaae      |
+|  192.168.10.15             |
+|  available                 |
+|                            |
+|  subnet-07aeeb5d0be46e10a  |
+|  prod-sg                   |
+|  sg-0d096b2b1ba49eaae      |
+|  192.168.10.21             |
+|  in-use                    |
+|                            |
+|  subnet-07aeeb5d0be46e10a  |
+|  prod-sg                   |
+|  sg-0d096b2b1ba49eaae      |
+|  192.168.10.29             |
+|  in-use                    |
++----------------------------+
+
+
+C:\Users\AM>
+
+-------------------------------------------------------------------------------
+
+aws ec2 describe-network-interfaces --query "NetworkInterfaces[*].[Description, SubnetId, Groups[0].GroupName, Groups[0].GroupId, PrivateIpAddress, Status]" --output table --region eu-central-1
+
+-------------------------------------------------------------------------------
+
+C:\Users\AM>aws ec2 describe-network-interfaces --query "NetworkInterfaces[*].[Description, SubnetId, Groups[0].GroupName, Groups[0].GroupId, PrivateIpAddress, Status]" --output table --region eu-central-1
+----------------------------------------------------------------------------------------------------------------
+|                                           DescribeNetworkInterfaces                                          |
++---------------+----------------------------+----------+-----------------------+----------------+-------------+
+|  ENI-for-App01|  subnet-07aeeb5d0be46e10a  |  prod-sg |  sg-0d096b2b1ba49eaae |  192.168.10.15 |  available  |
+|               |  subnet-07aeeb5d0be46e10a  |  prod-sg |  sg-0d096b2b1ba49eaae |  192.168.10.21 |  in-use     |
+|               |  subnet-07aeeb5d0be46e10a  |  prod-sg |  sg-0d096b2b1ba49eaae |  192.168.10.29 |  in-use     |
++---------------+----------------------------+----------+-----------------------+----------------+-------------+
+
+C:\Users\AM>
+
+-------------------------------------------------------------------------------
+
+
+***************
+Delete ENI:-
+***************
+
+aws ec2 delete-network-interface --network-interface-id eni-0c1ca7dee946c9b01 --region eu-central-1
+
+-------------------------------------------------------------------------------
+
+C:\Users\AM>aws ec2 delete-network-interface --network-interface-id eni-0c1ca7dee946c9b01 --region eu-central-1
+
+C:\Users\AM>
+
+-------------------------------------------------------------------------------
+
+*******************************************************
+Created Elastic Network Interface (ENI) WITH Name :-
+*******************************************************
+
+aws ec2 create-network-interface --subnet-id subnet-07aeeb5d0be46e10a --private-ip-address 192.168.10.15 --groups sg-0d096b2b1ba49eaae --description "ENI-for-App01" --tag-specifications ResourceType=network-interface,Tags=[{Key=Name,Value=ENI-App01}] --region eu-central-1
+
+-------------------------------------------------------------------------------
+
+C:\Users\AM>aws ec2 create-network-interface --subnet-id subnet-07aeeb5d0be46e10a --private-ip-address 192.168.10.15 --groups sg-0d096b2b1ba49eaae --description "ENI-for-App01" --tag-specifications ResourceType=network-interface,Tags=[{Key=Name,Value=ENI-App01}] --region eu-central-1
+{
+    "NetworkInterface": {
+        "AvailabilityZone": "eu-central-1a",
+        "Description": "ENI-for-App01",
+        "Groups": [
+            {
+                "GroupId": "sg-0d096b2b1ba49eaae",
+                "GroupName": "prod-sg"
+            }
+        ],
+        "InterfaceType": "interface",
+        "Ipv6Addresses": [],
+        "MacAddress": "02:39:fd:8a:39:9b",
+        "NetworkInterfaceId": "eni-0d996ca5f40b38016",
+        "OwnerId": "016299216080",
+        "PrivateDnsName": "ip-192-168-10-15.eu-central-1.compute.internal",
+        "PrivateIpAddress": "192.168.10.15",
+        "PrivateIpAddresses": [
+            {
+                "Primary": true,
+                "PrivateDnsName": "ip-192-168-10-15.eu-central-1.compute.internal",
+                "PrivateIpAddress": "192.168.10.15"
+            }
+        ],
+        "RequesterId": "AIDAQHS4CJTIJZD4KILHN",
+        "RequesterManaged": false,
+        "SourceDestCheck": true,
+        "Status": "pending",
+        "SubnetId": "subnet-07aeeb5d0be46e10a",
+        "TagSet": [
+            {
+                "Key": "Name",
+                "Value": "ENI-App01"
+            }
+        ],
+        "VpcId": "vpc-0a7dc8eb09f52cc13",
+        "Operator": {
+            "Managed": false
+        },
+        "AvailabilityZoneId": "euc1-az2"
+    }
+}
+
+
+C:\Users\AM>
+
+-------------------------------------------------------------------------------
+
+*******************************************************************************************************************
+Describe ENI - Name, ENI-ID, Description, Subnet ID, Security Group Name, Security Group ID, IP Address, State:-
+*******************************************************************************************************************
+
+aws ec2 describe-network-interfaces --query "NetworkInterfaces[*].["TagSet[0].Value", NetworkInterfaceId, Description, SubnetId, Groups[0].GroupName, Groups[0].GroupId, PrivateIpAddress, Status]" --output table --region eu-central-1
+
+-------------------------------------------------------------------------------
+
+C:\Users\AM>aws ec2 describe-network-interfaces --query "NetworkInterfaces[*].["TagSet[0].Value", NetworkInterfaceId, Description, SubnetId, Groups[0].GroupName, Groups[0].GroupId, PrivateIpAddress, Status]" --output table --region eu-central-1
+------------------------------------------------------------------------------------------------------------------------------------------------------
+|                                                              DescribeNetworkInterfaces                                                             |
++-----------+------------------------+----------------+---------------------------+----------+-----------------------+-----------------+-------------+
+|  None     |  eni-0de2db72586b67897 |                |  subnet-07aeeb5d0be46e10a |  prod-sg |  sg-0d096b2b1ba49eaae |  192.168.10.29  |  in-use     |
+|  None     |  eni-04171e823e501b8fc |                |  subnet-07aeeb5d0be46e10a |  prod-sg |  sg-0d096b2b1ba49eaae |  192.168.10.21  |  in-use     |
+|  ENI-App01|  eni-0d996ca5f40b38016 |  ENI-for-App01 |  subnet-07aeeb5d0be46e10a |  prod-sg |  sg-0d096b2b1ba49eaae |  192.168.10.15  |  available  |
++-----------+------------------------+----------------+---------------------------+----------+-----------------------+-----------------+-------------+
+
+
+C:\Users\AM>
+
+-------------------------------------------------------------------------------
