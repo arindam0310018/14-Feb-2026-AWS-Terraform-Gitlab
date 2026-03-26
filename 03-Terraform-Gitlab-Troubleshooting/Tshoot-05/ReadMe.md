@@ -7,6 +7,6 @@ Below follows the Platform information to better understand the Issue and Resolu
 | CICD |  Gitlab |
 | Cloud Provider |  AWS |
 
-| <img src="../../Images/02-Tf-Gitlab-Tshoot/Err-05.jpg"> | 
+| <img src="../../Images/Err-05.jpg"> | 
 | --------- |
 
