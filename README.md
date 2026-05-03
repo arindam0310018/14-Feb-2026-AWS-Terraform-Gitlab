@@ -1,2 +1,2 @@
 # AWS | Terraform | Gitlab:-
-This Repository contains everything related to AWS, Terraform and Gitlab.
+This Repository contains everything related to AWS, AWS CLI, Terraform and Gitlab.
